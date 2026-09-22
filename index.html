@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Verifikasi e-Sertifikat | SMA Negeri 3 Yogyakarta</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{
@@ -122,6 +122,23 @@ function ambil(q){
   }
   return go();
 }
+function norm(s){
+  return String(s==null?"":s).trim().toLowerCase().replace(/\s+/g," ").replace(/^no\s*:\s*/,"");
+}
+function cari(rows,no){
+  var k=norm(no);
+  for(var i=0;i<rows.length;i++){ if(norm(rows[i].no)===k) return rows[i]; }
+  return null;
+}
+function lalu(iso){
+  var m=(Date.now()-new Date(iso).getTime())/60000;
+  if(!isFinite(m)||m<0) return "";
+  if(m<1) return "baru saja";
+  if(m<60) return Math.floor(m)+" menit lalu";
+  var j=Math.floor(m/60);
+  if(j<24) return j+" jam "+Math.floor(m%60)+" menit lalu";
+  return Math.floor(m/24)+" hari lalu";
+}
 function el(h){var t=document.createElement("div");t.innerHTML=h;return t.firstChild;}
 function row(k,v,mono){
   return '<div class="row"><div class="k">'+k+'</div><div class="v '+(mono?'mono':'')+'">'+esc(v)+'</div></div>';
@@ -136,26 +153,24 @@ var q="";
 try{ q=new URLSearchParams(location.search).get("no")||""; q=q.trim(); }catch(e){}
 var isi=document.getElementById("isi");
 
-if(!q){
-  isi.innerHTML='<div class="xwrap"><svg viewBox="0 0 52 52"><line class="x1" x1="15" y1="15" x2="37" y2="37"/><line class="x2" x1="37" y1="15" x2="15" y2="37"/></svg></div>'
-    +'<div class="badge nt" style="display:flex">TANPA NOMOR SERTIFIKAT</div>'
-    +'<p class="err">Gunakan tautan pada QR Code sertifikat untuk memverifikasi keasliannya.</p>';
-}else{
+function tampil(d,sumber){
+  isi.innerHTML='<div class="checkwrap"><svg viewBox="0 0 52 52"><circle class="circ" cx="26" cy="26" r="24"/><path class="tick" d="M15 27l7.5 7.5L37 19"/></svg></div>'
+    +'<div class="badge ok"><span class="dot"></span>SERTIFIKAT TERVERIFIKASI</div>'
+    +'<div class="rows">'
+    +row("Nomor Sertifikat",d.no,true)
+    +row("Nama Lengkap",d.nama)
+    +row("Asal Sekolah",d.sek)
+    +row("Peran",d.peran)
+    +row("Diterbitkan",d.tgl)
+    +'</div>'
+    +(d.pdf?'<a class="btn" href="'+esc(d.pdf)+'" target="_blank" rel="noopener">Lihat Sertifikat Digital &#8599;</a>':'')
+    +'<div class="stamp">Diverifikasi pada <b>'+nowStamp()+'</b><br>'+esc(sumber)+'</div>'
+    +'<div class="note">Nama pada halaman ini dibaca langsung dari basis data resmi panitia sehingga tidak dapat dipalsukan.</div>';
+}
+function viaApi(){
   ambil(q).then(function(d){
-    if(d.ok){
-      isi.innerHTML='<div class="checkwrap"><svg viewBox="0 0 52 52"><circle class="circ" cx="26" cy="26" r="24"/><path class="tick" d="M15 27l7.5 7.5L37 19"/></svg></div>'
-        +'<div class="badge ok"><span class="dot"></span>SERTIFIKAT TERVERIFIKASI</div>'
-        +'<div class="rows">'
-        +row("Nomor Sertifikat",d.no,true)
-        +row("Nama Lengkap",d.nama)
-        +row("Asal Sekolah",d.sek)
-        +row("Peran",d.peran)
-        +row("Diterbitkan",d.tgl)
-        +'</div>'
-        +(d.pdf?'<a class="btn" href="'+esc(d.pdf)+'" target="_blank" rel="noopener">Lihat Sertifikat Digital &#8599;</a>':'')
-        +'<div class="stamp">Diverifikasi pada <b>'+nowStamp()+'</b></div>'
-        +'<div class="note">Nama pada halaman ini dibaca langsung dari basis data resmi panitia sehingga tidak dapat dipalsukan.</div>';
-    }else{
+    if(d.ok){ tampil(d,"Dibaca langsung dari basis data panitia"); }
+    else{
       isi.innerHTML='<div class="xwrap"><svg viewBox="0 0 52 52"><line class="x1" x1="15" y1="15" x2="37" y2="37"/><line class="x2" x1="37" y1="15" x2="15" y2="37"/></svg></div>'
         +'<div class="badge no">SERTIFIKAT TIDAK DITEMUKAN</div>'
         +'<p class="err">Nomor <b>&quot;'+esc(d.q)+'&quot;</b> tidak terdaftar pada basis data panitia. Sertifikat yang memuat nomor ini <b>tidak valid</b>.</p>'
@@ -165,6 +180,20 @@ if(!q){
     isi.innerHTML='<div class="badge nt" style="display:flex">GAGAL MEMERIKSA</div>'
       +'<p class="err">Koneksi ke basis data panitia tidak dapat dijangkau. Periksa koneksi internet lalu muat ulang halaman.</p>';
   });
+}
+if(!q){
+  isi.innerHTML='<div class="xwrap"><svg viewBox="0 0 52 52"><line class="x1" x1="15" y1="15" x2="37" y2="37"/><line class="x2" x1="37" y1="15" x2="15" y2="37"/></svg></div>'
+    +'<div class="badge nt" style="display:flex">TANPA NOMOR SERTIFIKAT</div>'
+    +'<p class="err">Gunakan tautan pada QR Code sertifikat untuk memverifikasi keasliannya.</p>';
+}else{
+  fetch("data.json",{cache:"no-cache"}).then(function(r){
+    if(!r.ok) throw new Error("http "+r.status);
+    return r.json();
+  }).then(function(db){
+    var hit=cari(db.rows||[],q);
+    if(hit){ tampil(hit,"Basis data peserta diperbarui "+lalu(db.generated_at)); }
+    else{ viaApi(); }
+  }).catch(viaApi);
 }
 </script>
 </body>
