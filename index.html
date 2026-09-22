@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Verifikasi e-Sertifikat | SMA Negeri 3 Yogyakarta</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg1:#0b1220; --ink:#0f172a; --mut:#8ea0b8; --line:#e9eef5;
+  --green:#10b981; --greenD:#047857; --red:#ef4444; --redD:#b91c1c;
+  --vio1:#6366f1; --vio2:#8b5cf6;
+}
+html,body{min-height:100%}
+body{
+  font-family:'Plus Jakarta Sans',Arial,sans-serif;color:var(--ink);
+  background:var(--bg1);display:flex;align-items:center;justify-content:center;
+  min-height:100vh;padding:22px;overflow-x:hidden;position:relative;
+}
+/* latar gradien hidup */
+.blob{position:fixed;border-radius:50%;filter:blur(90px);opacity:.5;pointer-events:none;animation:drift 16s ease-in-out infinite alternate}
+.b1{width:420px;height:420px;background:#4338ca;top:-140px;left:-120px}
+.b2{width:380px;height:380px;background:#065f46;bottom:-160px;right:-120px;animation-delay:-8s}
+@keyframes drift{from{transform:translate(0,0) scale(1)}to{transform:translate(40px,26px) scale(1.12)}}
+
+.card{
+  position:relative;width:100%;max-width:440px;background:rgba(255,255,255,.97);
+  border:1px solid rgba(255,255,255,.6);border-radius:26px;padding:34px 28px 20px;
+  box-shadow:0 30px 80px rgba(2,6,23,.55);animation:pop .5s cubic-bezier(.2,.8,.25,1);
+}
+@keyframes pop{from{opacity:0;transform:translateY(18px) scale(.98)}to{opacity:1;transform:none}}
+
+.top{display:flex;align-items:center;gap:12px}
+.logo{width:46px;height:46px;object-fit:contain}
+.school{font-size:11px;font-weight:800;letter-spacing:.14em;color:#334155;text-transform:uppercase}
+.ev{font-size:11px;font-weight:600;color:#94a3b8;margin-top:2px}
+
+h1{font-size:30px;font-weight:800;margin-top:20px;letter-spacing:-.02em;
+   background:linear-gradient(120deg,#312e81,#6d28d9 55%,#0f766e);-webkit-background-clip:text;background-clip:text;color:transparent}
+.sub{font-size:13px;color:var(--mut);margin-top:4px}
+
+.badge{display:inline-flex;align-items:center;gap:9px;margin-top:20px;padding:10px 17px;border-radius:999px;
+  font-size:12.5px;font-weight:800;letter-spacing:.07em}
+.ok{background:#ecfdf5;color:var(--greenD);border:1px solid #a7f3d0;box-shadow:0 6px 18px rgba(16,185,129,.18)}
+.no{background:#fef2f2;color:var(--redD);border:1px solid #fecaca}
+.nt{background:#f1f5f9;color:#475569;border:1px solid #e2e8f0}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--green);animation:pl 1.7s infinite}
+@keyframes pl{0%,100%{box-shadow:0 0 0 0 rgba(16,185,129,.55)}50%{box-shadow:0 0 0 7px rgba(16,185,129,0)}}
+
+.rows{margin-top:18px;border-top:1px solid var(--line)}
+.row{display:flex;justify-content:space-between;gap:14px;padding:12px 2px;border-bottom:1px solid var(--line);
+     transform-origin:left;animation:rise .5s both}
+.row:nth-child(1){animation-delay:.05s}.row:nth-child(2){animation-delay:.12s}
+.row:nth-child(3){animation-delay:.19s}.row:nth-child(4){animation-delay:.26s}.row:nth-child(5){animation-delay:.33s}
+@keyframes rise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.k{font-size:12px;color:#94a3b8;font-weight:600;padding-top:2px;white-space:nowrap}
+.v{font-size:14.5px;font-weight:700;text-align:right;word-break:break-word}
+.mono{font-family:Consolas,Menlo,monospace;font-size:13px;background:#f1f5f9;border:1px solid #e2e8f0;
+      border-radius:8px;padding:3px 9px}
+
+.btn{display:flex;align-items:center;justify-content:center;gap:9px;margin-top:22px;width:100%;padding:15px 16px;
+  border-radius:15px;background:linear-gradient(120deg,#4f46e5,#7c3aed);color:#fff;font-weight:800;font-size:14.5px;
+  text-decoration:none;box-shadow:0 12px 28px rgba(79,70,229,.4);transition:transform .15s,box-shadow .15s}
+.btn:hover{transform:translateY(-2px);box-shadow:0 16px 34px rgba(79,70,229,.5)}
+.stamp{margin-top:15px;font-size:11px;color:#94a3b8;text-align:center;line-height:1.7}
+.stamp b{color:#475569;font-weight:700}
+.note{margin-top:13px;font-size:11.5px;color:#94a3b8;line-height:1.65;text-align:center;
+      background:#f8fafc;border:1px dashed #e2e8f0;border-radius:12px;padding:10px 12px}
+.err{margin-top:18px;font-size:14px;color:#475569;line-height:1.7}
+.foot{margin-top:16px;padding-top:12px;border-top:1px solid var(--line);font-size:10.5px;color:#b6c2d4;text-align:center;line-height:1.8}
+
+/* loading */
+.load{display:flex;flex-direction:column;align-items:center;gap:16px;margin-top:34px;margin-bottom:18px}
+.ring{width:46px;height:46px;border-radius:50%;border:4px solid #e2e8f0;border-top-color:#6366f1;animation:spin .9s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.load span{font-size:12.5px;color:#64748b;font-weight:600}
+
+/* centang SVG */
+.checkwrap{display:flex;justify-content:center;margin-top:20px}
+.checkwrap svg{width:74px;height:74px}
+.circ{fill:none;stroke:#10b981;stroke-width:3.5;stroke-dasharray:166;stroke-dashoffset:166;animation:draw .7s .15s forwards}
+.tick{fill:none;stroke:#10b981;stroke-width:5;stroke-linecap:round;stroke-linejoin:round;
+      stroke-dasharray:48;stroke-dashoffset:48;animation:draw .45s .75s forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+.xwrap svg{width:64px;height:64px}
+.x1,.x2{fill:none;stroke:#ef4444;stroke-width:5;stroke-linecap:round;stroke-dasharray:40;stroke-dashoffset:40;animation:draw .4s .5s forwards}
+.x2{animation-delay:.68s}
+</style>
+</head>
+<body>
+<div class="blob b1"></div><div class="blob b2"></div>
+<div class="card">
+  <div class="top">
+    <img class="logo" src="https://sma3jogja.sch.id/wp-content/uploads/2021/05/LOGO-PADMANABA-TRANS-1.png" alt="Logo">
+    <div>
+      <div class="school">SMA Negeri 3 Yogyakarta</div>
+      <div class="ev">Webinar Nasional Informatika 2026</div>
+    </div>
+  </div>
+  <h1>Verifikasi e-Sertifikat</h1>
+  <div class="sub">Sertifikat diperiksa langsung ke basis data panitia</div>
+  <div id="isi"><div class="load"><div class="ring"></div><span>Memeriksa nomor sertifikat...</span></div></div>
+  <div class="foot">Verifikasi dapat dilakukan kapan saja dengan memindai QR Code pada sertifikat.<br>
+  Sistem validasi: <b>Zafran Hulaif Rusydi</b>, XI-2 Informatika</div>
+</div>
+<script>
+var API = "https://script.google.com/macros/s/AKfycbxdoe2tSGeX76ReDkHJK8EKu94DjE01KdNJPxOg4EOCBTwVvoe-L4IxRR-7mDRdNdHA2w/exec";
+function ambil(q){
+  var u = API + "?authuser=0&json=1&no=" + encodeURIComponent(q);
+  var coba = 0;
+  function go(){
+    coba++;
+    return fetch(u).then(function(r){
+      if(!r.ok) throw new Error("http " + r.status);
+      return r.json();
+    }).catch(function(e){
+      if(coba < 4){ return new Promise(function(res){ setTimeout(res, 700 * coba); }).then(go); }
+      throw e;
+    });
+  }
+  return go();
+}
+function el(h){var t=document.createElement("div");t.innerHTML=h;return t.firstChild;}
+function row(k,v,mono){
+  return '<div class="row"><div class="k">'+k+'</div><div class="v '+(mono?'mono':'')+'">'+esc(v)+'</div></div>';
+}
+function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function nowStamp(){
+  var b=["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
+  var d=new Date();
+  return d.getDate()+" "+b[d.getMonth()]+" "+d.getFullYear()+", "+String(d.getHours()).padStart(2,"0")+"."+String(d.getMinutes()).padStart(2,"0")+" WIB";
+}
+var q="";
+try{ q=new URLSearchParams(location.search).get("no")||""; q=q.trim(); }catch(e){}
+var isi=document.getElementById("isi");
+
+if(!q){
+  isi.innerHTML='<div class="xwrap"><svg viewBox="0 0 52 52"><line class="x1" x1="15" y1="15" x2="37" y2="37"/><line class="x2" x1="37" y1="15" x2="15" y2="37"/></svg></div>'
+    +'<div class="badge nt" style="display:flex">TANPA NOMOR SERTIFIKAT</div>'
+    +'<p class="err">Gunakan tautan pada QR Code sertifikat untuk memverifikasi keasliannya.</p>';
+}else{
+  ambil(q).then(function(d){
+    if(d.ok){
+      isi.innerHTML='<div class="checkwrap"><svg viewBox="0 0 52 52"><circle class="circ" cx="26" cy="26" r="24"/><path class="tick" d="M15 27l7.5 7.5L37 19"/></svg></div>'
+        +'<div class="badge ok"><span class="dot"></span>SERTIFIKAT TERVERIFIKASI</div>'
+        +'<div class="rows">'
+        +row("Nomor Sertifikat",d.no,true)
+        +row("Nama Lengkap",d.nama)
+        +row("Asal Sekolah",d.sek)
+        +row("Peran",d.peran)
+        +row("Diterbitkan",d.tgl)
+        +'</div>'
+        +(d.pdf?'<a class="btn" href="'+esc(d.pdf)+'" target="_blank" rel="noopener">Lihat Sertifikat Digital &#8599;</a>':'')
+        +'<div class="stamp">Diverifikasi pada <b>'+nowStamp()+'</b></div>'
+        +'<div class="note">Nama pada halaman ini dibaca langsung dari basis data resmi panitia sehingga tidak dapat dipalsukan.</div>';
+    }else{
+      isi.innerHTML='<div class="xwrap"><svg viewBox="0 0 52 52"><line class="x1" x1="15" y1="15" x2="37" y2="37"/><line class="x2" x1="37" y1="15" x2="15" y2="37"/></svg></div>'
+        +'<div class="badge no">SERTIFIKAT TIDAK DITEMUKAN</div>'
+        +'<p class="err">Nomor <b>&quot;'+esc(d.q)+'&quot;</b> tidak terdaftar pada basis data panitia. Sertifikat yang memuat nomor ini <b>tidak valid</b>.</p>'
+        +'<div class="note">Periksa kembali nomor sertifikat, atau hubungi panitia Webinar Nasional Informatika 2026.</div>';
+    }
+  }).catch(function(){
+    isi.innerHTML='<div class="badge nt" style="display:flex">GAGAL MEMERIKSA</div>'
+      +'<p class="err">Koneksi ke basis data panitia tidak dapat dijangkau. Periksa koneksi internet lalu muat ulang halaman.</p>';
+  });
+}
+</script>
+</body>
+</html>
